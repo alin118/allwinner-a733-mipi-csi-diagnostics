@@ -22,10 +22,12 @@ pre-5.11 kernel headers and never fills the field. Every IS_FLAG check fails, la
 to 1, the PHY listens on a single lane, the 2-lane stream is halved (644 px), thousands of ECC errors,
 empty payloads -> "sensor dead". One patch (`sunxi_mipi.c:937-940`: force 2 lanes when 0) revives the link.
 
-## Repo layout
+## Repo layout (flat)
 
-- `driver/` — patched BSP sources (`imx219_bsp.c`, `vin_tdm.c`, `sunxi_mipi.c`, `sunxi_isp.c`), kernel 6.6.98-sun60iw2
-- `userspace/` — `livec.c` (RAW10 unpack + debayer + AWB + AE + fb0 viewer), `runc.sh` (stream orchestrator)
+- `imx219_bsp.c` — working sensor module (28980 B, md5 77627f62...), 2x2 binned 720p mode
+- `vin_tdm.c`, `sunxi_mipi.c`, `sunxi_isp.c` — patched BSP sources (all patches marked `/* PATCHxxx */`), kernel 6.6.98-sun60iw2
+- `livec.c` — RAW10 unpack + debayer + AWB + AE + fb0 viewer (md5 6f1101bb...)
+- `runc.sh` — stream orchestrator (md5 8c2bae5a...)
 - `PATCHES.md` — every patch with file:line and rationale
 - `IMX219_A733_FINAL_REPORT.txt` — full diagnostic history: dead receiver -> root cause -> live video
 
@@ -38,8 +40,8 @@ sudo cp drivers/vin/modules/sensor/imx219.ko /lib/modules/$(uname -r)/kernel/bsp
 sudo depmod -a
 
 # live preview, 30 s
-gcc -O2 -o ~/livec userspace/livec.c -lm
-sudo cp userspace/runc.sh ~/
+gcc -O2 -o ~/livec livec.c -lm
+sudo cp runc.sh ~/
 sudo ~/runc.sh 30 3        # 30 = seconds, 3 = bayer phase (RGGB)
 ```
 
